@@ -1,66 +1,21 @@
-$('.telegram-form').on('submit', function (event) {
+const TOKEN = '6199072332:AAH0FNRe-xweyv3SfXdoMbojgCfBFAIkClQ'
+const CHAT_ID = '-1001569099157'
+const URI_API = `https://api.telegram.org/bot${TOKEN}/sendMessage`
 
-    event.stopPropagation();
-    event.preventDefault();
+document
+  .querySelector('.telegram-form')
+  .addEventListener('submit', function (e) {
+    e.preventDefault()
 
-    let form = this,
-        submit = $('.submit', form),
-        data = new FormData(),
-        files = $('input[type=file]')
+    let message = `<b>Заявка с сайта!</b>\n`
+    message += `<b>Отправитель:</b>${this.name.value}\n`
+    message += `<b>Почта:</b>${this.email.value}\n`
+    message += `<b>Телефон:</b>${this.phone.value}\n`
+    message += `<b>text:</b>${this.text.value}\n`
 
-
-    $('.submit', form).val('Отправка...');
-    $('input, textarea', form).attr('disabled','');
-
-    data.append( 'name', 		$('[name="name"]', form).val() );
-    data.append( 'phone', 		$('[name="phone"]', form).val() );
-    data.append( 'email', 		$('[name="email"]', form).val() );
-    data.append( 'text', 		$('[name="text"]', form).val() );
-    data.append( 'file', 		$('[name="file"]', form).val() );
-   
-
-    files.each(function (key, file) {
-        let cont = file.files;
-        if ( cont ) {
-            $.each( cont, function( key, value ) {
-                data.append( key, value );
-            });
-        }
-    });
-    
-    $.ajax({
-        url: 'ajax.php',
-        type: 'POST',
-        data: data,
-        cache: false,
-        dataType: 'json',
-        processData: false,
-        contentType: false,
-        xhr: function() {
-            let myXhr = $.ajaxSettings.xhr();
-
-            if ( myXhr.upload ) {
-                myXhr.upload.addEventListener( 'progress', function(e) {
-                    if ( e.lengthComputable ) {
-                        let percentage = ( e.loaded / e.total ) * 100;
-                            percentage = percentage.toFixed(0);
-                        $('.submit', form)
-                            .html( percentage + '%' );
-                    }
-                }, false );
-            }
-
-            return myXhr;
-        },
-        error: function( jqXHR, textStatus ) {
-            // Тут выводим ошибку
-        },
-        complete: function() {
-            // Тут можем что-то делать ПОСЛЕ успешной отправки формы
-            console.log('Complete')
-            form.reset() 
-        }
-    });
-
-    return false;
-});
+    axios.post(URI_API, {
+      chat_id: CHAT_ID,
+      parse_mode: 'html',
+      text: message,
+    })
+  })
